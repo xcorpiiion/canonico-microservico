@@ -63,8 +63,8 @@ jobs:
           echo "Criando package.json dinâmico com a versão do Maven..."
           echo '{
             "name": "@xcorpiiion/canonico-ts",
-            "version": "${{ steps.get_version.outputs.PROJECT_VERSION }}",
-            "description": "Classes Canônicas v${{ steps.get_version.outputs.PROJECT_VERSION }}",
+            "version": "${{ steps.get_version.outputs.PROJECT_VERSION }}-${{ github.run_number }}",
+            "description": "Classes Canônicas",
             "main": "models.ts",
             "repository": {
               "type": "git",
