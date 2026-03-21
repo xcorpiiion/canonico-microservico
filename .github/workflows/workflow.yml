@@ -2,14 +2,14 @@ name: Deploy do Canônico para o GitHub Packages
 
 on:
   push:
-    branches: [ "main", "master" ] # Ele vai rodar sempre que você der push nessas branches
+    branches: [ "main", "master" ]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write # Importante para ter permissão de subir o JAR
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
@@ -19,10 +19,11 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          server-id: github # Esse ID tem que bater com o que tá no seu pom.xml e no settings.xml fictício.
-          settings-path: ${{ github.workspace }} # Onde ele vai criar o settings.xml temporário
+          server-id: github
+          # Removi o settings-path para ele usar o padrão do Runner, que é mais seguro
 
       - name: Publish to GitHub Packages
-        run: mvn --batch-mode clean deploy
+        # Adicionei o "-s" para garantir que ele use o settings gerado pelo setup-java
+        run: mvn --batch-mode clean deploy -s /home/runner/.m2/settings.xml
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # O GitHub gera esse token automaticamente pra você, nem precisa criar Secret!
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
