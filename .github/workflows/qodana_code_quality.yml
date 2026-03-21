@@ -11,9 +11,10 @@ jobs:
   qodana:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
-      checks: write
+      contents: write      # Para ele conseguir ler o código e postar correções
+      pull-requests: write # Para comentar no seu PR
+      checks: write        # Para marcar o check verdinho de sucesso
+      security-events: write # <--- O PULO DO GATO É ESSE AQUI!
     steps:
       - uses: actions/checkout@v4
         with:
