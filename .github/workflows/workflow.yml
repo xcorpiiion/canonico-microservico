@@ -1,4 +1,4 @@
-name: Deploy do Canônico para o GitHub Packages
+name: Deploy do Canônico (Java & NPM)
 
 on:
   push:
@@ -20,10 +20,60 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           server-id: github
-          # Removi o settings-path para ele usar o padrão do Runner, que é mais seguro
 
-      - name: Publish to GitHub Packages
-        # Adicionei o "-s" para garantir que ele use o settings gerado pelo setup-java
-        run: mvn --batch-mode clean deploy -s /home/runner/.m2/settings.xml
+      # --- ETAPA JAVA ---
+      - name: Build and Publish Java Jar
+        run: |
+          echo "::group::🚀 Iniciando Build Maven"
+          echo "Compilando e gerando artefatos Java..."
+          mvn --batch-mode clean deploy -s /home/runner/.m2/settings.xml
+          echo "::notice::Deploy do JAR finalizado com sucesso no GitHub Packages!"
+          echo "::endgroup::"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@xcorpiiion'
+
+      # --- ETAPA NPM (TS) ---
+      - name: Publish NPM Package
+        run: |
+          echo "::group::📦 Preparando Pacote NPM"
+          
+          echo "Navegando para a pasta de arquivos gerados..."
+          cd target/generated-ts
+          
+          echo "Verificando se o models.ts foi criado..."
+          if [ -f "models.ts" ]; then
+            echo "::notice::Arquivo models.ts encontrado!"
+          else
+            echo "::error::Arquivo models.ts não foi gerado pelo Maven!"
+            exit 1
+          fi
+
+          echo "Criando package.json dinâmico..."
+          echo '{
+            "name": "@xcorpiiion/canonico-ts",
+            "version": "1.0.0",
+            "description": "Classes Canônicas para projetos Angular",
+            "main": "models.ts",
+            "repository": {
+              "type": "git",
+              "url": "git+https://github.com/xcorpiiion/canonico-microservico.git"
+            },
+            "publishConfig": {
+              "registry": "https://npm.pkg.github.com"
+            }
+          }' > package.json
+
+          echo "Iniciando o publish no registro do GitHub..."
+          npm publish
+          
+          echo "::notice::Lib TypeScript publicada com sucesso!"
+          echo "::endgroup::"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

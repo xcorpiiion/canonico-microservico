@@ -80,6 +80,35 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>cz.habarta.typescript-generator</groupId>
+                <artifactId>typescript-generator-maven-plugin</artifactId>
+                <version>3.2.1263</version>
+                <executions>
+                    <execution>
+                        <id>generate</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jsonLibrary>jackson2</jsonLibrary>
+                    <classPatterns>
+                        <classPattern>br.com.study.canonico.**DTO</classPattern>
+                        <classPattern>br.com.study.canonico.generic.AbstractId</classPattern>
+                    </classPatterns>
+                    <outputFile>target/generated-ts/models.ts</outputFile>
+                    <outputKind>module</outputKind>
+                    <outputFileType>implementationFile</outputFileType>
+
+                    <mapClasses>asClasses</mapClasses>
+
+                    <mapDate>asString</mapDate>
+                    <noFileComment>true</noFileComment>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
