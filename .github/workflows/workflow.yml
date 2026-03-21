@@ -19,7 +19,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          server-id: github # Esse ID tem que bater com o que tá no seu pom.xml e no settings.xml fictício
+          server-id: github # Esse ID tem que bater com o que tá no seu pom.xml e no settings.xml fictício.
           settings-path: ${{ github.workspace }} # Onde ele vai criar o settings.xml temporário
 
       - name: Publish to GitHub Packages
