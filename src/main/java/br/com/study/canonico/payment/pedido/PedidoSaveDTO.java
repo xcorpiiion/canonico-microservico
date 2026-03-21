@@ -5,8 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 @Getter
@@ -14,11 +13,11 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class PedidoSaveDTO extends PedidoDTO {
 
-    private PagamentoDTO pagamento;
+    // Remova as linhas abaixo, elas já existem no PedidoDTO
+    // private PagamentoDTO pagamento;
+    // private List<ItemPedidoDTO> itemPedidos; 
 
-    private List<ItemPedidoDTO> itemPedidos;
-
-    public PedidoSaveDTO(LocalDateTime instante, PagamentoDTO pagamento, Long clienteId, Long enderecoId, Set<ItemPedidoDTO> itemPedidos) {
+    public PedidoSaveDTO(ZonedDateTime instante, PagamentoDTO pagamento, Long clienteId, Long enderecoId, Set<ItemPedidoDTO> itemPedidos) {
         super(instante, pagamento, clienteId, enderecoId, itemPedidos);
     }
 }

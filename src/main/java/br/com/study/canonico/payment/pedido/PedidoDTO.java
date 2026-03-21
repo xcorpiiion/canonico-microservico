@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 @Getter
@@ -18,7 +19,7 @@ import java.util.Set;
 public class PedidoDTO extends AbstractId<Long> {
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
-    private LocalDateTime instante;
+    private ZonedDateTime instante;
 
     private PagamentoDTO pagamento;
 
