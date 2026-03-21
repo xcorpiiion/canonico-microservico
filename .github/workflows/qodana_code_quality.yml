@@ -1,0 +1,48 @@
+name: Qodana Quality Gate
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  qodana:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necessário para o Qodana comparar as versões
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven' # Agiliza o processo baixando as dependências do cache
+
+      - name: 'Qodana Scan'
+        uses: JetBrains/qodana-action@v2025.3
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+        with:
+          # Analisa o projeto todo para garantir que o "coração" do sistema está limpo
+          pr-mode: false
+          use-caches: true
+          post-pr-comment: true
+          use-annotations: true
+          upload-result: true # Ativei para você poder ver o relatório detalhado no GitHub
+          
+          # Aqui ele vai tentar corrigir bobeiras de formatação sozinho (Ultimate plan)
+          push-fixes: 'pull-request'
+
+      - name: Update Report
+        if: github.ref == 'refs/heads/master'
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json

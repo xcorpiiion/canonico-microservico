@@ -1,0 +1,28 @@
+name: Deploy do Canônico para o GitHub Packages
+
+on:
+  push:
+    branches: [ "main", "master" ] # Ele vai rodar sempre que você der push nessas branches
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Importante para ter permissão de subir o JAR
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          server-id: github # Esse ID tem que bater com o que tá no seu pom.xml e no settings.xml fictício
+          settings-path: ${{ github.workspace }} # Onde ele vai criar o settings.xml temporário
+
+      - name: Publish to GitHub Packages
+        run: mvn --batch-mode clean deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # O GitHub gera esse token automaticamente pra você, nem precisa criar Secret!
