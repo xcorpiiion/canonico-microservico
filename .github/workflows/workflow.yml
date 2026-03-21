@@ -21,11 +21,18 @@ jobs:
           distribution: 'temurin'
           server-id: github
 
+      # --- EXTRAÇÃO DE VERSÃO (O PULO DO GATO) ---
+      - name: Get Maven Version
+        id: get_version
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "PROJECT_VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "::notice::Versão detectada no POM: $VERSION"
+
       # --- ETAPA JAVA ---
       - name: Build and Publish Java Jar
         run: |
           echo "::group::🚀 Iniciando Build Maven"
-          echo "Compilando e gerando artefatos Java..."
           mvn --batch-mode clean deploy -s /home/runner/.m2/settings.xml
           echo "::notice::Deploy do JAR finalizado com sucesso no GitHub Packages!"
           echo "::endgroup::"
@@ -42,24 +49,22 @@ jobs:
       # --- ETAPA NPM (TS) ---
       - name: Publish NPM Package
         run: |
-          echo "::group::📦 Preparando Pacote NPM"
+          echo "::group::📦 Preparando Pacote NPM v${{ steps.get_version.outputs.PROJECT_VERSION }}"
           
-          echo "Navegando para a pasta de arquivos gerados..."
           cd target/generated-ts
           
-          echo "Verificando se o models.ts foi criado..."
           if [ -f "models.ts" ]; then
             echo "::notice::Arquivo models.ts encontrado!"
           else
-            echo "::error::Arquivo models.ts não foi gerado pelo Maven!"
+            echo "::error::Arquivo models.ts não foi gerado pelo Maven! Verifique o plugin no pom.xml"
             exit 1
           fi
 
-          echo "Criando package.json dinâmico..."
+          echo "Criando package.json dinâmico com a versão do Maven..."
           echo '{
             "name": "@xcorpiiion/canonico-ts",
-            "version": "1.0.0",
-            "description": "Classes Canônicas para projetos Angular",
+            "version": "${{ steps.get_version.outputs.PROJECT_VERSION }}",
+            "description": "Classes Canônicas v${{ steps.get_version.outputs.PROJECT_VERSION }}",
             "main": "models.ts",
             "repository": {
               "type": "git",
@@ -73,7 +78,7 @@ jobs:
           echo "Iniciando o publish no registro do GitHub..."
           npm publish
           
-          echo "::notice::Lib TypeScript publicada com sucesso!"
+          echo "::notice::Lib v${{ steps.get_version.outputs.PROJECT_VERSION }} publicada com sucesso!"
           echo "::endgroup::"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
