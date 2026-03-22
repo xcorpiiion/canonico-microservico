@@ -1,49 +1,28 @@
-name: Qodana Quality Gate
+name: Qodana
 on:
   workflow_dispatch:
   pull_request:
   push:
-    branches:
-      - master
-      - main
+    branches: # Specify your branches here
+      - main # The 'main' branch
+      - 'releases/*' # The release branches
 
 jobs:
   qodana:
     runs-on: ubuntu-latest
     permissions:
-      contents: write      # Para ele conseguir ler o código e postar correções
-      pull-requests: write # Para comentar no seu PR.
-      checks: write        # Para marcar o check verdinho de sucesso
-      security-events: write # <--- O PULO DO GATO É ESSE AQUI!
+      contents: write
+      pull-requests: write
+      checks: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Necessário para o Qodana comparar as versões
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'maven' # Agiliza o processo baixando as dependências do cache
-
+          ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
+          fetch-depth: 0  # a full history is required for pull request analysis
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2025.3
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
-          # Analisa o projeto todo para garantir que o "coração" do sistema está limpo
           pr-mode: false
-          use-caches: true
-          post-pr-comment: true
-          use-annotations: true
-          upload-result: true # Ativei para você poder ver o relatório detalhado no GitHub
-          
-          # Aqui ele vai tentar corrigir bobeiras de formatação sozinho (Ultimate plan)
-          push-fixes: 'pull-request'
-
-      - name: Update Report
-        if: github.ref == 'refs/heads/master'
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_649500073 }}
+          QODANA_ENDPOINT: 'https://qodana.cloud'
