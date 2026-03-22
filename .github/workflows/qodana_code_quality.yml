@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write      # Para ele conseguir ler o código e postar correções
-      pull-requests: write # Para comentar no seu PR
+      pull-requests: write # Para comentar no seu PR.
       checks: write        # Para marcar o check verdinho de sucesso
       security-events: write # <--- O PULO DO GATO É ESSE AQUI!
     steps:
