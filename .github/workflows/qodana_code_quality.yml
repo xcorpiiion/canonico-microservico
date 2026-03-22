@@ -24,9 +24,8 @@ jobs:
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2025.3
         with:
-          args: --image,jetbrains/qodana-jvm:latest
+          args: --image,jetbrains/qodana-jvm:2025.3
           # 0 = Tolerância Zero. Se houver 1 erro crítico/vulnerabilidade, o build morre.
-          fail-threshold: '0'
           pr-mode: false
         env:
           # Usei o nome do seu novo secret conforme você alterou
