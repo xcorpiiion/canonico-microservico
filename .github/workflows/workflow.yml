@@ -33,7 +33,7 @@ jobs:
       - name: Build and Publish Java Jar
         run: |
           echo "::group::🚀 Iniciando Build Maven"
-          mvn --batch-mode clean deploy -s /home/runner/.m2/settings.xml
+          mvn --batch-mode clean package -s /home/runner/.m2/settings.xml
           echo "::notice::Deploy do JAR finalizado com sucesso no GitHub Packages!"
           echo "::endgroup::"
         env:
